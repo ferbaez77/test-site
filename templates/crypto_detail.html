@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ coin.name | default(coin.id) }} Details - AI Trading Insights{% endblock %}
+
+{% block content %}
+<div class="crypto-detail-container">
+    {% if coin.error %}
+        <h2>Error loading details for {{ coin.id }}</h2>
+        <p>{{ coin.error }}</p>
+    {% else %}
+        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            {% if coin.image %}
+                <img src="{{ coin.image }}" alt="{{ coin.name }} icon" style="width: 48px; height: 48px; margin-right: 15px; border-radius: 50%;">
+            {% endif %}
+            <div>
+                <h2 style="margin: 0;">{{ coin.name }} ({{ coin.symbol }})</h2>
+                {% if coin.current_price %}
+                    <p style="margin: 5px 0 0 0; font-size: 1.2em; color: #4CAF50;">Price: ${{ coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if coin.description and "No description available" not in coin.description %}
+            <h3>About {{ coin.name }}</h3>
+            <p class="coin-description" style="font-size: 0.9em; max-height: 150px; overflow-y: auto; background-color: #2c2c2c; padding: 10px; border-radius: 4px; line-height: 1.5;">
+                {{ coin.description }}
+            </p>
+        {% endif %}
+
+        <h3>Price Chart (OHLCV - Last 30 Days)</h3>
+        <div id="candlestick-chart-container" style="width: 100%; max-width: 800px; height: 400px; margin: 20px auto; background-color: #2c2c2c; border: 1px solid #383838; display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+            [Candlestick Chart Loading...]
+        </div>
+        {# Script for fetching OHLCV and rendering chart will be added in Part 8c #}
+    {% endif %}
+</div>
+<script>
+    // Part 8c will go here
+    // For now, just log the coin ID to confirm page is loading
+    console.log("Crypto Detail Page for: {{ coin.id }}");
+</script>
+{% endblock %}

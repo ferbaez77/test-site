@@ -1,10 +1,154 @@
 {% extends "base.html" %}
 
-{% block title %}Home - AI Trading Insights{% endblock %}
+{% block title %}Top Cryptocurrencies - AI Trading Insights{% endblock %}
 
 {% block content %}
-<h2>Welcome to AI Trading Insights</h2>
-<p>This platform provides simulated AI-driven trading signals for educational and demonstration purposes. Explore the potential of AI in financial markets.</p>
-<p>Please remember that these are not real trading recommendations.</p>
-<p><a href="/signals">View Live Signals</a></p>
+<h2>Top Cryptocurrencies by Market Cap</h2>
+<p id="loading-message" class="loading-message">Loading cryptocurrency data...</p>
+<div class="table-container">
+    <table id="crypto-table" style="display:none;"> <!-- Initially hidden until data is loaded -->
+        <thead>
+            <tr>
+                <th>#</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>24h %</th>
+            <th>Market Cap</th>
+            <th>Volume (24h)</th>
+                <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="crypto-table-body">
+        <!-- Crypto data will be inserted here by JavaScript -->
+    </tbody>
+</table>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.getElementById('crypto-table');
+    const tableBody = document.getElementById('crypto-table-body');
+    const loadingMessage = document.getElementById('loading-message');
+
+    fetch('/api/homepage_cryptos')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(cryptos => {
+            loadingMessage.style.display = 'none'; // Hide loading message
+            table.style.display = ''; // Show table
+
+            if (!cryptos || cryptos.length === 0) {
+                // If backend returned an empty list but no HTTP error (e.g. Coingecko had no data but our API endpoint is fine)
+                // Or if get_top_crypto_data itself returned empty on some non-exception error.
+                // The HTTPException in main.py should catch most backend issues.
+                const row = tableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 7; // Number of columns
+                cell.textContent = 'No cryptocurrency data available at the moment.';
+                cell.style.textAlign = 'center';
+                return;
+            }
+            
+            cryptos.forEach(crypto => {
+                const row = tableBody.insertRow();
+
+                // Rank
+                const rankCell = row.insertCell();
+                rankCell.textContent = crypto.market_cap_rank || 'N/A';
+
+                // Name (Icon + Name + Symbol)
+                const nameCell = row.insertCell();
+                nameCell.innerHTML = `
+                    <a href="/crypto/${crypto.id}" style="text-decoration: none; color: inherit;">
+                        <img src="${crypto.image}" alt="${crypto.name} icon" class="crypto-icon">
+                        ${crypto.name} <span class="crypto-symbol">(${crypto.symbol.toUpperCase()})</span>
+                    </a>
+                `;
+
+                // Price
+                const priceCell = row.insertCell();
+                priceCell.textContent = crypto.current_price !== null ? `$${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'N/A';
+
+                // 24h % Change
+                const changeCell = row.insertCell();
+                const change = crypto.price_change_percentage_24h;
+                changeCell.textContent = change !== null ? `${change.toFixed(2)}%` : 'N/A';
+                if (change !== null) {
+                    changeCell.className = change >= 0 ? 'positive-change' : 'negative-change';
+                }
+                
+                // Market Cap
+                const marketCapCell = row.insertCell();
+                marketCapCell.textContent = crypto.market_cap !== null ? `$${crypto.market_cap.toLocaleString('en-US')}` : 'N/A';
+                
+                // Volume (24h)
+                const volumeCell = row.insertCell();
+                volumeCell.textContent = crypto.total_volume !== null ? `$${crypto.total_volume.toLocaleString('en-US')}` : 'N/A';
+
+                // Actions Cell (Predict Button)
+                const actionsCell = row.insertCell();
+                actionsCell.innerHTML = `
+                    <button class="btn btn-predict" data-crypto-id="${crypto.id}" data-crypto-name="${crypto.name}">Predict</button>
+                    <span id="prediction-result-${crypto.id}" class="prediction-result-area"></span>
+                `;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching cryptocurrency data:', error);
+            loadingMessage.textContent = 'Failed to load cryptocurrency data. Please try again later.';
+            loadingMessage.style.display = 'block'; // Ensure it's visible
+            table.style.display = 'none'; // Hide table if error
+        });
+
+    tableBody.addEventListener('click', function(event) {
+        const button = event.target.closest('.btn-predict'); // Use closest to handle clicks on text within button
+        if (button) {
+            event.preventDefault(); // Prevent any default button action if it were, say, in a form
+            const cryptoId = button.dataset.cryptoId;
+            const cryptoName = button.dataset.cryptoName;
+            const resultArea = document.getElementById(`prediction-result-${cryptoId}`);
+
+            if (!resultArea) {
+                console.error('Result area not found for', cryptoId);
+                return;
+            }
+
+            resultArea.textContent = '⏳ Predicting...';
+            resultArea.style.color = '#e0e0e0'; // Reset color
+            button.disabled = true;
+
+            const apiUrl = `/api/predict/${encodeURIComponent(cryptoId)}?crypto_name=${encodeURIComponent(cryptoName)}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok, status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    resultArea.textContent = data.message;
+                    if (data.predicted_trend === "UP") {
+                        resultArea.style.color = '#4CAF50'; // Green
+                    } else if (data.predicted_trend === "DOWN") {
+                        resultArea.style.color = '#F44336'; // Red
+                    } else { // SIDEWAYS or other neutral cases
+                        resultArea.style.color = '#64b5f6'; // A light blue for neutral/sideways
+                    }
+                })
+                .catch(error => {
+                    resultArea.textContent = 'Prediction failed.';
+                    resultArea.style.color = '#F44336'; // Red for error
+                    console.error('Prediction API error for', cryptoId, ':', error);
+                })
+                .finally(() => {
+                    button.disabled = false;
+                });
+        }
+    });
+});
+</script>
 {% endblock %}
