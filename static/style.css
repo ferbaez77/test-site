@@ -1,0 +1,158 @@
+/* Basic Reset & Body Styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    line-height: 1.6;
+}
+
+/* Container for centering content */
+.container {
+    width: 80%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styling */
+header {
+    background-color: #2c2c2c; /* Slightly lighter dark shade for header */
+    padding: 1em 0;
+    border-bottom: 1px solid #383838;
+    text-align: center; /* Center header content */
+}
+
+header h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 2em;
+}
+
+header nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+header nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+header nav ul li a {
+    color: #4CAF50; /* Accent color for nav links */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+header nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content Styling */
+main {
+    padding: 20px 0; /* Vertical padding */
+}
+
+h2 {
+    color: #4CAF50; /* Accent color for headings */
+    border-bottom: 1px solid #383838;
+    padding-bottom: 10px;
+    margin-top: 0; /* Remove default top margin for h2 if it's the first element in main */
+}
+
+p {
+    margin-bottom: 1em;
+}
+
+a {
+    color: #4CAF50; /* Accent color */
+}
+
+a:hover {
+    color: #66bb6a; /* Lighter accent on hover */
+}
+
+/* Signals Page Specific Styling */
+#signals-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between signal cards */
+}
+
+.signal-card {
+    background-color: #2c2c2c; /* Card background */
+    border: 1px solid #383838;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.signal-card .pair {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.signal-card .action {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.signal-card .action.buy {
+    color: #4CAF50; /* Green for BUY */
+}
+
+.signal-card .action.sell {
+    color: #F44336; /* Red for SELL */
+}
+
+.signal-card .confidence {
+    font-size: 0.9em;
+    color: #b0b0b0; /* Lighter grey for less important info */
+    margin-bottom: 5px;
+}
+
+.signal-card .timestamp {
+    font-size: 0.8em;
+    color: #888888; /* Even lighter grey */
+    text-align: right;
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 30px;
+    border-top: 1px solid #383838;
+    font-size: 0.9em;
+    color: #aaaaaa;
+}
+
+/* Utility for loading message */
+.loading-message {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Chart Placeholder Styling */
+.chart-placeholder-container {
+    width: 100%;
+    max-width: 600px; /* Max width of the SVG */
+    margin: 20px auto; /* Center it and add some margin */
+    background-color: #2c2c2c; /* Match SVG background for container */
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chart-placeholder-container img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4px; /* Optional: if image itself has no border-radius */
+}

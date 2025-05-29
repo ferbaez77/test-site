@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Trading Insights{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>AI Trading Insights</h1>
+        <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/signals">Live Signals</a></li>
+                </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2023 AI Trading Insights - For Educational Purposes Only</p>
+    </footer>
+</body>
+</html>

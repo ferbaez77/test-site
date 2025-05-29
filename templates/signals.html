@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Live Signals - AI Trading Insights{% endblock %}
+
+{% block content %}
+<h2>Live AI Trading Signals</h2>
+<div class="chart-placeholder-container">
+    <img src="{{ url_for('static', path='/images/placeholder_chart.svg') }}" alt="Trading Chart Placeholder">
+</div>
+<div id="signals-container">
+    <p class="loading-message">Loading signals...</p>
+    <!-- Signals will be loaded here by JavaScript -->
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const signalsContainer = document.getElementById('signals-container');
+
+    fetch('/api/signals')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(signals => {
+            signalsContainer.innerHTML = ''; // Clear "Loading..." message
+
+            if (signals && signals.length > 0) {
+                signals.forEach(signal => {
+                    const card = document.createElement('div');
+                    card.classList.add('signal-card');
+
+                    const pair = document.createElement('div');
+                    pair.classList.add('pair');
+                    pair.textContent = signal.pair;
+                    card.appendChild(pair);
+
+                    const action = document.createElement('div');
+                    action.classList.add('action');
+                    action.classList.add(signal.action.toLowerCase()); // Adds 'buy' or 'sell' class
+                    action.textContent = `Action: ${signal.action}`;
+                    card.appendChild(action);
+
+                    const confidence = document.createElement('div');
+                    confidence.classList.add('confidence');
+                    // Format confidence to a percentage string if it's a float
+                    const confidencePercentage = (signal.confidence * 100).toFixed(0);
+                    confidence.textContent = `Confidence: ${confidencePercentage}%`;
+                    card.appendChild(confidence);
+
+                    const timestamp = document.createElement('div');
+                    timestamp.classList.add('timestamp');
+                    // Format timestamp for better readability if needed
+                    const date = new Date(signal.timestamp);
+                    timestamp.textContent = `Time: ${date.toLocaleString()}`;
+                    card.appendChild(timestamp);
+
+                    signalsContainer.appendChild(card);
+                });
+            } else {
+                signalsContainer.innerHTML = '<p>No trading signals available at the moment.</p>';
+            }
+        })
+        .catch(error => {
+            signalsContainer.innerHTML = '<p>Error loading signals. Please try again later.</p>';
+            console.error('Error fetching trading signals:', error);
+        });
+});
+</script>
+{% endblock %}
